@@ -1,10 +1,12 @@
 const data = {};
+const CASILLA = 10;
+const INTERVAL = 50;
 const templates = {
   ventanaSinRepeticion: 'X>X>XvXvX<X<X^X^',
   ventanaConRepeticion: '(X>)2(Xv)2(X<)2(X^)2',
   ventanaDoble: '[Dibujar ventana doble]\n\n"Dibujar ventana doble"\n [Dibujar ventana]\n (>)4\n [Dibujar ventana]\n\n"Dibujar ventana"\n (X>)2\n (Xv)2\n (X<)2\n (X^)2',
   veleroSinProcedimientos: '(X<)7(X>^)7(Xv)7\n>>(X^)6>(X>vv)3(X<)4\nvv(X>)5(Xv<)2\n(X<)11(X^<)2(X>)10',
-  veleroConProcedimientos: '[Dibujar velero]\n\n"Dibujar velero"\n [Dibujar vela izquierda]\n >>\n [Dibujar vela derecha]\n vv\n [Dibujar casco]\n\n"Dibujar vela derecha"\n (X^)6>(X>vv)3(X<)4\n\n"Dibujar vela izquierda"\n (X<)7(X>^)7(Xv)7\n\n"Dibujar casco"\n (X>)5(Xv<)2(X<)11(X^<)2(X>)10'
+  veleroConProcedimientos: '[Dibujar velero]\n\n"Dibujar velero"\n [Dibujar vela izquierda]\n >>\n [Dibujar vela derecha]\n vv\n [Dibujar casco]\n\n"Dibujar vela izquierda"\n (X<)7(X>^)7(Xv)7\n\n"Dibujar vela derecha"\n (X^)6>(X>vv)3(X<)4\n\n"Dibujar casco"\n (X>)5(Xv<)2(X<)11(X^<)2(X>)10'
 };
 
 window.addEventListener('load', function() {
@@ -50,17 +52,23 @@ function ejecutar() {
 }
 
 function dibujar() {
-  const CASILLA = 10;
   let canvas = document.getElementById("canvas");
+  data.limites.x --; data.limites.y--;
   let ancho = data.limites.w - data.limites.x;
   let alto = data.limites.h - data.limites.y;
   canvas.width = (Math.max(10, ancho) + 2) * CASILLA;
   canvas.height = (Math.max(10, alto) + 2) * CASILLA;
-  let ctx = canvas.getContext("2d");
-  for (let d of data.dibujo) {
-    ctx.beginPath();
-    ctx.rect((d.x - data.limites.x)*CASILLA, (d.y - data.limites.y)*CASILLA, CASILLA-1, CASILLA-1);
-    ctx.fill();
+  data.ctx = canvas.getContext("2d");
+  seguirDibujando();
+}
+
+function seguirDibujando() {
+  if (data.dibujo.length > 0) {
+    let d = data.dibujo.shift();
+    data.ctx.beginPath();
+    data.ctx.rect((d.x - data.limites.x)*CASILLA, (d.y - data.limites.y)*CASILLA, CASILLA-1, CASILLA-1);
+    data.ctx.fill();
+    setTimeout(seguirDibujando, INTERVAL);
   }
 }
 
